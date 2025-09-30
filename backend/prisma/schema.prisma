@@ -1,0 +1,129 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  id_usuario      Int       @id @default(autoincrement())
+  nome_completo   String
+  email           String    @unique
+  senha           String
+  data_cadastro   DateTime  @default(now())
+  enderecos       Endereco[]
+  exemplares      Exemplar[]
+  trocas_solicitadas Troca[] @relation("Solicitante")
+  avaliacoes      Avaliacao[]
+
+  @@map("usuario")
+}
+
+model Endereco {
+  id_endereco Int     @id @default(autoincrement())
+  id_usuario  Int
+  estado      String?
+  cidade      String?
+  bairro      String?
+  rua         String?
+  numero      String?
+  complemento String?
+  cep         String?
+  usuario     Usuario @relation(fields: [id_usuario], references: [id_usuario])
+}
+
+model Livro {
+  id_livro       Int          @id @default(autoincrement())
+  isbn           String?      @unique
+  titulo         String
+  ano_publicacao Int?
+  exemplares     Exemplar[]
+  autores        LivroAutor[]
+  generos        LivroGenero[]
+  editoras       LivroEditora[]
+}
+
+model Autor {
+  id_autor  Int         @id @default(autoincrement())
+  nome_autor String
+  livros    LivroAutor[]
+}
+
+model LivroAutor {
+  id_livro Int
+  id_autor Int
+  livro    Livro @relation(fields: [id_livro], references: [id_livro])
+  autor    Autor @relation(fields: [id_autor], references: [id_autor])
+  @@id([id_livro, id_autor])
+}
+
+model Genero {
+  id_genero Int         @id @default(autoincrement())
+  nome_genero String
+  livros    LivroGenero[]
+}
+
+model LivroGenero {
+  id_livro Int
+  id_genero Int
+  livro    Livro  @relation(fields: [id_livro], references: [id_livro])
+  genero   Genero @relation(fields: [id_genero], references: [id_genero])
+  @@id([id_livro, id_genero])
+}
+
+model Editora {
+  id_editora Int         @id @default(autoincrement())
+  nome_editora String
+  livros    LivroEditora[]
+}
+
+model LivroEditora {
+  id_livro   Int
+  id_editora Int
+  livro      Livro   @relation(fields: [id_livro], references: [id_livro])
+  editora    Editora @relation(fields: [id_editora], references: [id_editora])
+  @@id([id_livro, id_editora])
+}
+
+model Exemplar {
+  id_exemplar Int      @id @default(autoincrement())
+  id_livro    Int
+  id_usuario  Int
+  estado_conservacao String?
+  status      String?
+  livro       Livro   @relation(fields: [id_livro], references: [id_livro])
+  usuario     Usuario @relation(fields: [id_usuario], references: [id_usuario])
+  trocas      TrocaExemplar[]
+}
+
+model Troca {
+  id_troca       Int       @id @default(autoincrement())
+  id_solicitante Int
+  status_troca   String?
+  data_solicitacao DateTime @default(now())
+  data_confirmacao DateTime?
+  solicitante    Usuario @relation("Solicitante", fields: [id_solicitante], references: [id_usuario])
+  exemplares     TrocaExemplar[]
+  avaliacoes     Avaliacao[]
+}
+
+model TrocaExemplar {
+  id_troca     Int
+  id_exemplar  Int
+  troca        Troca    @relation(fields: [id_troca], references: [id_troca])
+  exemplar     Exemplar @relation(fields: [id_exemplar], references: [id_exemplar])
+  @@id([id_troca, id_exemplar])
+}
+
+model Avaliacao {
+  id_avaliacao Int      @id @default(autoincrement())
+  id_troca     Int
+  id_usuario   Int
+  data_avaliacao DateTime @default(now())
+  nota         Int?
+  comentario   String?
+  troca        Troca    @relation(fields: [id_troca], references: [id_troca])
+  usuario      Usuario  @relation(fields: [id_usuario], references: [id_usuario])
+}
