@@ -32,6 +32,8 @@ model Endereco {
   complemento String?
   cep         String?
   usuario     Usuario @relation(fields: [id_usuario], references: [id_usuario])
+
+  @@map("endereco")
 }
 
 model Livro {
@@ -43,12 +45,16 @@ model Livro {
   autores        LivroAutor[]
   generos        LivroGenero[]
   editoras       LivroEditora[]
+
+  @@map("livro")
 }
 
 model Autor {
   id_autor  Int         @id @default(autoincrement())
   nome_autor String
   livros    LivroAutor[]
+
+  @@map("autor")
 }
 
 model LivroAutor {
@@ -57,12 +63,16 @@ model LivroAutor {
   livro    Livro @relation(fields: [id_livro], references: [id_livro])
   autor    Autor @relation(fields: [id_autor], references: [id_autor])
   @@id([id_livro, id_autor])
+
+  @@map("livroautor")
 }
 
 model Genero {
   id_genero Int         @id @default(autoincrement())
   nome_genero String
   livros    LivroGenero[]
+
+  @@map("genero")
 }
 
 model LivroGenero {
@@ -71,12 +81,16 @@ model LivroGenero {
   livro    Livro  @relation(fields: [id_livro], references: [id_livro])
   genero   Genero @relation(fields: [id_genero], references: [id_genero])
   @@id([id_livro, id_genero])
+
+  @@map("livrogenero")
 }
 
 model Editora {
   id_editora Int         @id @default(autoincrement())
   nome_editora String
   livros    LivroEditora[]
+
+  @@map("editora")
 }
 
 model LivroEditora {
@@ -85,6 +99,8 @@ model LivroEditora {
   livro      Livro   @relation(fields: [id_livro], references: [id_livro])
   editora    Editora @relation(fields: [id_editora], references: [id_editora])
   @@id([id_livro, id_editora])
+
+  @@map("livroeditora")
 }
 
 model Exemplar {
@@ -96,6 +112,8 @@ model Exemplar {
   livro       Livro   @relation(fields: [id_livro], references: [id_livro])
   usuario     Usuario @relation(fields: [id_usuario], references: [id_usuario])
   trocas      TrocaExemplar[]
+
+  @@map("exemplar")
 }
 
 model Troca {
@@ -107,6 +125,8 @@ model Troca {
   solicitante    Usuario @relation("Solicitante", fields: [id_solicitante], references: [id_usuario])
   exemplares     TrocaExemplar[]
   avaliacoes     Avaliacao[]
+
+  @@map("troca")
 }
 
 model TrocaExemplar {
@@ -115,6 +135,8 @@ model TrocaExemplar {
   troca        Troca    @relation(fields: [id_troca], references: [id_troca])
   exemplar     Exemplar @relation(fields: [id_exemplar], references: [id_exemplar])
   @@id([id_troca, id_exemplar])
+
+  @@map("trocaexemplar")
 }
 
 model Avaliacao {
@@ -126,4 +148,6 @@ model Avaliacao {
   comentario   String?
   troca        Troca    @relation(fields: [id_troca], references: [id_troca])
   usuario      Usuario  @relation(fields: [id_usuario], references: [id_usuario])
+
+  @@map("avaliacao")
 }
