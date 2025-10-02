@@ -7,6 +7,7 @@ import tradeRouter from "./routes/troca.routes";
 import avaliacaoRoutes from "./routes/avaliacao.routes";
 import autorRoutes from "./routes/autor.routes";
 import generoRoutes from "./routes/genero.routes";
+import editoraRoutes from "./routes/editora.routes";
 
 const app = express();
 
@@ -19,8 +20,7 @@ app.use("/api", tradeRouter);
 app.use("/api", avaliacaoRoutes);
 app.use("/api", autorRoutes);
 app.use("/api", generoRoutes);
-
-
+app.use("/api/publishers", editoraRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
