@@ -35,3 +35,22 @@ export const getUsers = async (req: Request, res: Response) => {
     return res.status(500).json({ error: "Error fetching users" });
   }
 };
+
+export const getUserById = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    const user = await prisma.usuario.findUnique({
+      where: { id_usuario: Number(id) },
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    return res.json(user);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Error fetching user" });
+  }
+};
