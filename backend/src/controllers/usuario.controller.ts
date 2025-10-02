@@ -54,3 +54,28 @@ export const getUserById = async (req: Request, res: Response) => {
     return res.status(500).json({ error: "Error fetching user" });
   }
 };
+
+export const updateUser = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { nome_completo, email, senha } = req.body;
+
+    const user = await prisma.usuario.update({
+      where: { id_usuario: Number(id) },
+      data: {
+        nome_completo,
+        email,
+        senha,
+      },
+    });
+
+    return res.json(user);
+  } catch (error: any) {
+    console.error(error);
+
+    if (error.code === "P2025") {
+      return res.status(404).json({ error: "User not found" });
+    }
+    return res.status(500).json({ error: "Error updating user" });
+  }
+};
