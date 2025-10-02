@@ -1,0 +1,1209 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Trade Books API",
+    "version": "1.0.0",
+    "description": "API para gerenciamento de usuários, livros, endereços, exemplares, trocas, autores, editoras, gêneros e avaliações."
+  },
+  "servers": [
+    { "url": "http://localhost:3000/api", "description": "Servidor local" }
+  ],
+  "tags": [
+    { "name": "Users" },
+    { "name": "Addresses" },
+    { "name": "Books" },
+    { "name": "Exemplars" },
+    { "name": "Trades" },
+    { "name": "Authors" },
+    { "name": "Publishers" },
+    { "name": "Genres" },
+    { "name": "BookGenres" },
+    { "name": "TradeExemplars" },
+    { "name": "Auth" },
+    { "name": "Evaluations" }
+  ],
+  "components": {
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "id_usuario": { "type": "integer", "example": 1 },
+          "nome_completo": { "type": "string", "example": "Maria Silva" },
+          "email": { "type": "string", "example": "maria@example.com" },
+          "senha": { "type": "string", "example": "hashedpassword123" },
+          "data_cadastro": { "type": "string", "format": "date-time", "example": "2025-10-01T00:00:00Z" }
+        }
+      },
+      "Address": {
+        "type": "object",
+        "properties": {
+          "id_endereco": { "type": "integer", "example": 1 },
+          "id_usuario": { "type": "integer", "example": 1 },
+          "estado": { "type": "string", "example": "SP" },
+          "cidade": { "type": "string", "example": "São Paulo" },
+          "bairro": { "type": "string", "example": "Centro" },
+          "rua": { "type": "string", "example": "Rua Exemplo" },
+          "numero": { "type": "string", "example": "123" },
+          "complemento": { "type": "string", "example": "Apto 45" },
+          "cep": { "type": "string", "example": "01000-000" }
+        }
+      },
+      "Book": {
+        "type": "object",
+        "properties": {
+          "id_livro": { "type": "integer", "example": 1 },
+          "isbn": { "type": "string", "example": "978-3-16-148410-0" },
+          "titulo": { "type": "string", "example": "Livro Exemplo" },
+          "ano_publicacao": { "type": "integer", "example": 2021 }
+        }
+      },
+      "Exemplar": {
+        "type": "object",
+        "properties": {
+          "id_exemplar": { "type": "integer", "example": 1 },
+          "id_livro": { "type": "integer", "example": 1 },
+          "id_usuario": { "type": "integer", "example": 1 },
+          "estado_conservacao": { "type": "string", "example": "Bom" },
+          "status": { "type": "string", "example": "Disponível" }
+        }
+      },
+      "Trade": {
+        "type": "object",
+        "properties": {
+          "id_troca": { "type": "integer", "example": 1 },
+          "id_solicitante": { "type": "integer", "example": 1 },
+          "status_troca": { "type": "string", "example": "Pendente" },
+          "data_solicitacao": { "type": "string", "format": "date-time", "example": "2025-10-01T10:00:00Z" },
+          "data_confirmacao": { "type": "string", "format": "date-time", "example": null }
+        }
+      },
+      "Author": { "type": "object", "properties": { "id_autor": { "type": "integer", "example": 1 }, "nome_autor": { "type": "string", "example": "João Pereira" } } },
+      "Publisher": { "type": "object", "properties": { "id_editora": { "type": "integer", "example": 1 }, "nome_editora": { "type": "string", "example": "Editora Exemplo" } } },
+      "Genre": { "type": "object", "properties": { "id_genero": { "type": "integer", "example": 1 }, "nome_genero": { "type": "string", "example": "Ficção" } } },
+      "BookGenre": { "type": "object", "properties": { "id_livro": { "type": "integer", "example": 1 }, "id_genero": { "type": "integer", "example": 1 } } },
+      "TradeExemplar": { "type": "object", "properties": { "id_troca": { "type": "integer", "example": 1 }, "id_exemplar": { "type": "integer", "example": 1 } } },
+      "Evaluation": { "type": "object", "properties": { "id_avaliacao": { "type": "integer", "example": 1 }, "id_troca": { "type": "integer", "example": 1 }, "id_usuario": { "type": "integer", "example": 1 }, "nota": { "type": "integer", "example": 5 }, "comentario": { "type": "string", "example": "Excelente!" } } },
+      "AuthRequest": { "type": "object", "properties": { "email": { "type": "string", "example": "user@example.com" }, "senha": { "type": "string", "example": "123456" } } },
+      "AuthResponse": { "type": "object", "properties": { "token": { "type": "string", "example": "jwt.token.here" } } }
+    }
+  },
+  "paths": {
+    "/users": {
+        "get": {
+        "tags": ["Users"],
+        "summary": "List all users",
+        "responses": {
+            "200": {
+            "description": "OK",
+            "content": {
+                "application/json": {
+                "schema": {
+                    "type": "array",
+                    "items": { "$ref": "#/components/schemas/User" }
+                }
+                }
+            }
+            }
+        }
+        },
+        "post": {
+        "tags": ["Users"],
+        "summary": "Create user",
+        "requestBody": {
+            "required": true,
+            "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/User" } }
+            }
+        },
+        "responses": {
+            "201": {
+            "description": "Created",
+            "content": {
+                "application/json": { "schema": { "$ref": "#/components/schemas/User" } }
+            }
+            }
+        }
+        }
+    },
+    "/users/{id}": {
+        "get": {
+        "tags": ["Users"],
+        "summary": "Get user by ID",
+        "parameters": [
+            { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+            "200": {
+            "description": "OK",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/User" } } }
+            },
+            "404": { "description": "Not Found" }
+        }
+        },
+        "put": {
+        "tags": ["Users"],
+        "summary": "Update user",
+        "parameters": [
+            { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "requestBody": {
+            "required": true,
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/User" } } }
+        },
+        "responses": { "200": { "description": "OK" } }
+        },
+        "delete": {
+        "tags": ["Users"],
+        "summary": "Delete user",
+        "parameters": [
+            { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+            "200": {
+            "description": "User successfully deleted",
+            "content": {
+                "application/json": {
+                "schema": {
+                    "type": "object",
+                    "example": { "message": "User deleted successfully" }
+                }
+                }
+            }
+            },
+            "404": {
+            "description": "User not found",
+            "content": {
+                "application/json": {
+                "schema": { "type": "object", "example": { "error": "User not found" } }
+                }
+            }
+            },
+            "500": {
+            "description": "Server error",
+            "content": {
+                "application/json": {
+                "schema": { "type": "object", "example": { "error": "Internal server error" } }
+                }
+            }
+            }
+        }
+        }
+    },
+    "/addresses": {
+        "get": {
+          "tags": ["Addresses"],
+          "summary": "List all addresses",
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": { "$ref": "#/components/schemas/Address" }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "post": {
+          "tags": ["Addresses"],
+          "summary": "Create address",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Address" } }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": "Created",
+              "content": {
+                "application/json": { "schema": { "$ref": "#/components/schemas/Address" } }
+              }
+            }
+          }
+        }
+    },
+    "/addresses/{id}": {
+      "get": {
+        "tags": ["Addresses"],
+        "summary": "Get address by ID",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Address" } } }
+          },
+          "404": { "description": "Not Found" }
+        }
+      },
+      "put": {
+        "tags": ["Addresses"],
+        "summary": "Update address",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Address" } } }
+        },
+        "responses": { "200": { "description": "OK" } }
+      },
+      "delete": {
+        "tags": ["Addresses"],
+        "summary": "Delete address",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Address successfully deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": { "message": "Address deleted successfully" }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Address not found",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "example": { "error": "Address not found" } }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "example": { "error": "Internal server error" } }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/books": {
+      "get": {
+        "tags": ["Books"],
+        "summary": "List all books",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Book" }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Books"],
+        "summary": "Create book",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/Book" } }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Book" } }
+            }
+          }
+        }
+      }
+    },
+    "/books/{id}": {
+      "get": {
+        "tags": ["Books"],
+        "summary": "Get book by ID",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Book" } } }
+          },
+          "404": { "description": "Not Found" }
+        }
+      },
+      "put": {
+        "tags": ["Books"],
+        "summary": "Update book",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Book" } } }
+        },
+        "responses": { "200": { "description": "OK" } }
+      },
+      "delete": {
+        "tags": ["Books"],
+        "summary": "Delete book",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Book successfully deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": { "message": "Book deleted successfully" }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Book not found",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "example": { "error": "Book not found" } }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "example": { "error": "Internal server error" } }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/exemplars": {
+      "get": {
+        "tags": ["Exemplars"],
+        "summary": "List all exemplars",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Exemplar" }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Exemplars"],
+        "summary": "Create exemplar",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/Exemplar" } }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Exemplar" } }
+            }
+          }
+        }
+      }
+    },
+    "/api/exemplars/{id}": {
+      "get": {
+        "tags": ["Exemplars"],
+        "summary": "Get exemplar by ID",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Exemplar" } } }
+          },
+          "404": { "description": "Not Found" }
+        }
+      },
+      "put": {
+        "tags": ["Exemplars"],
+        "summary": "Update exemplar",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Exemplar" } } }
+        },
+        "responses": { "200": { "description": "OK" } }
+      },
+      "delete": {
+        "tags": ["Exemplars"],
+        "summary": "Delete exemplar",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Exemplar successfully deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": { "message": "Exemplar deleted successfully" }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Exemplar not found",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "example": { "error": "Exemplar not found" } }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "example": { "error": "Internal server error" } }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/trades": {
+      "get": {
+        "tags": ["Trades"],
+        "summary": "List all trades",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Trade" }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Trades"],
+        "summary": "Create trade",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/Trade" } }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Trade" } }
+            }
+          }
+        }
+      }
+    },
+    "/api/trades/{id}": {
+      "get": {
+        "tags": ["Trades"],
+        "summary": "Get trade by ID",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Trade" } } }
+          },
+          "404": { "description": "Not Found" }
+        }
+      },
+      "put": {
+        "tags": ["Trades"],
+        "summary": "Update trade",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Trade" } } }
+        },
+        "responses": { "200": { "description": "OK" } }
+      },
+      "delete": {
+        "tags": ["Trades"],
+        "summary": "Delete trade",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Trade successfully deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": { "message": "Trade deleted successfully" }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Trade not found",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "example": { "error": "Trade not found" } }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "example": { "error": "Internal server error" } }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/authors": {
+      "get": {
+        "tags": ["Authors"],
+        "summary": "List all authors",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Author" }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Authors"],
+        "summary": "Create author",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/Author" } }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Author" } }
+            }
+          }
+        }
+      }
+    },
+    "/api/authors/{id}": {
+      "get": {
+        "tags": ["Authors"],
+        "summary": "Get author by ID",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Author" } } }
+          },
+          "404": { "description": "Not Found" }
+        }
+      },
+      "put": {
+        "tags": ["Authors"],
+        "summary": "Update author",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Author" } } }
+        },
+        "responses": { "200": { "description": "OK" } }
+      },
+      "delete": {
+        "tags": ["Authors"],
+        "summary": "Delete author",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Author successfully deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": { "message": "Author deleted successfully" }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Author not found",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "example": { "error": "Author not found" } }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "example": { "error": "Internal server error" } }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/publishers": {
+      "get": {
+        "tags": ["Publishers"],
+        "summary": "List all publishers",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Publisher" }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Publishers"],
+        "summary": "Create publisher",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/Publisher" } }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Publisher" } }
+            }
+          }
+        }
+      }
+    },
+    "/api/publishers/{id}": {
+      "get": {
+        "tags": ["Publishers"],
+        "summary": "Get publisher by ID",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Publisher" } } }
+          },
+          "404": { "description": "Not Found" }
+        }
+      },
+      "put": {
+        "tags": ["Publishers"],
+        "summary": "Update publisher",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Publisher" } } }
+        },
+        "responses": { "200": { "description": "OK" } }
+      },
+      "delete": {
+        "tags": ["Publishers"],
+        "summary": "Delete publisher",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Publisher successfully deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": { "message": "Publisher deleted successfully" }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Publisher not found",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "example": { "error": "Publisher not found" } }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "example": { "error": "Internal server error" } }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/genres": {
+      "get": {
+        "tags": ["Genres"],
+        "summary": "List all genres",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Genre" }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Genres"],
+        "summary": "Create genre",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/Genre" } }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Genre" } }
+            }
+          }
+        }
+      }
+    },
+    "/api/genres/{id}": {
+      "get": {
+        "tags": ["Genres"],
+        "summary": "Get genre by ID",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Genre" } } }
+          },
+          "404": { "description": "Not Found" }
+        }
+      },
+      "put": {
+        "tags": ["Genres"],
+        "summary": "Update genre",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Genre" } } }
+        },
+        "responses": { "200": { "description": "OK" } }
+      },
+      "delete": {
+        "tags": ["Genres"],
+        "summary": "Delete genre",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Genre successfully deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": { "message": "Genre deleted successfully" }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Genre not found",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "example": { "error": "Genre not found" } }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "example": { "error": "Internal server error" } }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/book-genres": {
+      "get": {
+        "tags": ["BookGenres"],
+        "summary": "List all book-genre relations",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/BookGenre" }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["BookGenres"],
+        "summary": "Create book-genre relation",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/BookGenre" } }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/BookGenre" } }
+            }
+          }
+        }
+      }
+    },
+    "/api/book-genres/{id}": {
+      "get": {
+        "tags": ["BookGenres"],
+        "summary": "Get book-genre relation by ID",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/BookGenre" } } }
+          },
+          "404": { "description": "Not Found" }
+        }
+      },
+      "put": {
+        "tags": ["BookGenres"],
+        "summary": "Update book-genre relation",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/BookGenre" } } }
+        },
+        "responses": { "200": { "description": "OK" } }
+      },
+      "delete": {
+        "tags": ["BookGenres"],
+        "summary": "Delete book-genre relation",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Relation successfully deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": { "message": "Book-genre relation deleted successfully" }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Relation not found",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "example": { "error": "Book-genre relation not found" } }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "example": { "error": "Internal server error" } }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/trade-examplars": {
+      "get": {
+        "tags": ["TradeExamplars"],
+        "summary": "List all trade examplars",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/TradeExamplar" }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["TradeExamplars"],
+        "summary": "Create trade examplar",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/TradeExamplar" } }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/TradeExamplar" } }
+            }
+          }
+        }
+      }
+    },
+    "/api/trade-examplars/{id}": {
+      "get": {
+        "tags": ["TradeExamplars"],
+        "summary": "Get trade examplar by ID",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TradeExamplar" } } }
+          },
+          "404": { "description": "Not Found" }
+        }
+      },
+      "put": {
+        "tags": ["TradeExamplars"],
+        "summary": "Update trade examplar",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TradeExamplar" } } }
+        },
+        "responses": { "200": { "description": "OK" } }
+      },
+      "delete": {
+        "tags": ["TradeExamplars"],
+        "summary": "Delete trade examplar",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Trade examplar successfully deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": { "message": "Trade examplar deleted successfully" }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Trade examplar not found",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "example": { "error": "Trade examplar not found" } }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "example": { "error": "Internal server error" } }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/evaluations": {
+      "get": {
+        "tags": ["Evaluations"],
+        "summary": "List all evaluations",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Evaluation" }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Evaluations"],
+        "summary": "Create evaluation",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/Evaluation" } }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Evaluation" } }
+            }
+          }
+        }
+      }
+    },
+    "/api/evaluations/{id}": {
+      "get": {
+        "tags": ["Evaluations"],
+        "summary": "Get evaluation by ID",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Evaluation" } } }
+          },
+          "404": { "description": "Not Found" }
+        }
+      },
+      "put": {
+        "tags": ["Evaluations"],
+        "summary": "Update evaluation",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Evaluation" } } }
+        },
+        "responses": { "200": { "description": "OK" } }
+      },
+      "delete": {
+        "tags": ["Evaluations"],
+        "summary": "Delete evaluation",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Evaluation successfully deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": { "message": "Evaluation deleted successfully" }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Evaluation not found",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "example": { "error": "Evaluation not found" } }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "example": { "error": "Internal server error" } }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/register": {
+      "post": { "tags": ["Auth"], "summary": "Register user", "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AuthRequest" } } } }, "responses": { "201": { "description": "Created", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/User" } } } } } }
+    },
+    "/auth/login": {
+      "post": { "tags": ["Auth"], "summary": "Login user", "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AuthRequest" } } } }, "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AuthResponse" } } } }, "401": { "description": "Unauthorized" } } }
+    }
+  }
+}

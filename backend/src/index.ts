@@ -1,4 +1,7 @@
 import express from "express";
+import swaggerUi from 'swagger-ui-express';
+
+import swaggerDocument from '../swagger.json';
 import userRoutes from "./routes/usuario.routes";
 import enderecoRoutes from "./routes/endereco.routes";
 import livroRoutes from "./routes/livro.routes";
@@ -17,7 +20,7 @@ import authRoutes from "./routes/auth.routes";
 const app = express();
 
 app.use(express.json());
-app.use(userRoutes);
+app.use("/api", userRoutes);
 app.use("/api", enderecoRoutes);
 app.use("/api", livroRoutes);
 app.use("/api", exemplarRoutes);
@@ -31,6 +34,7 @@ app.use("/api/book-publishers", livroEditoraRoutes);
 app.use("/api/book-genres", livroGeneroRoutes);
 app.use("/api/trades-exemplars", trocaExemplarRoutes);
 app.use("/api/auth", authRoutes);
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
