@@ -6,6 +6,7 @@ import exemplarRoutes from "./routes/exemplar.routes";
 import tradeRouter from "./routes/troca.routes";
 import avaliacaoRoutes from "./routes/avaliacao.routes";
 import autorRoutes from "./routes/autor.routes";
+import generoRoutes from "./routes/genero.routes";
 
 const app = express();
 
@@ -17,6 +18,8 @@ app.use("/api", exemplarRoutes);
 app.use("/api", tradeRouter);
 app.use("/api", avaliacaoRoutes);
 app.use("/api", autorRoutes);
+app.use("/api", generoRoutes);
+
 
 
 const PORT = process.env.PORT || 3000;
