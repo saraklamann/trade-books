@@ -12,6 +12,7 @@ import livroAutorRoutes from "./routes/livroAutor.routes";
 import livroEditoraRoutes from "./routes/livroEditora.routes";
 import livroGeneroRoutes from "./routes/livroGenero.routes";
 import trocaExemplarRoutes from "./routes/trocaExemplar.routes";
+import authRoutes from "./routes/auth.routes";
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.use("/api/book-authors", livroAutorRoutes);
 app.use("/api/book-publishers", livroEditoraRoutes);
 app.use("/api/book-genres", livroGeneroRoutes);
 app.use("/api/trades-exemplars", trocaExemplarRoutes);
+app.use("/api/auth", authRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
