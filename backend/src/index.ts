@@ -8,6 +8,7 @@ import avaliacaoRoutes from "./routes/avaliacao.routes";
 import autorRoutes from "./routes/autor.routes";
 import generoRoutes from "./routes/genero.routes";
 import editoraRoutes from "./routes/editora.routes";
+import livroAutorRoutes from "./routes/livroAutor.routes";
 
 const app = express();
 
@@ -21,6 +22,7 @@ app.use("/api", avaliacaoRoutes);
 app.use("/api", autorRoutes);
 app.use("/api", generoRoutes);
 app.use("/api/publishers", editoraRoutes);
+app.use("/api/book-authors", livroAutorRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
