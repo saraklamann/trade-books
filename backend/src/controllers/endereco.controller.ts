@@ -38,3 +38,25 @@ export const getAllAddresses = async (req: Request, res: Response) => {
     return res.status(500).json({ error: "Error fetching addresses" });
   }
 };
+
+export const getAddressById = async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  try {
+    const address = await prisma.endereco.findUnique({
+      where: { id_endereco: parseInt(id) },
+      include: {
+        usuario: true, 
+      },
+    });
+
+    if (!address) {
+      return res.status(404).json({ error: "Address not found" });
+    }
+
+    return res.json(address);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Error fetching address" });
+  }
+};
