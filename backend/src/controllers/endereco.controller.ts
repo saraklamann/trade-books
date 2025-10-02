@@ -60,3 +60,31 @@ export const getAddressById = async (req: Request, res: Response) => {
     return res.status(500).json({ error: "Error fetching address" });
   }
 };
+
+export const updateAddress = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { estado, cidade, bairro, rua, numero, complemento, cep } = req.body;
+
+  try {
+    const updatedAddress = await prisma.endereco.update({
+      where: { id_endereco: parseInt(id) },
+      data: {
+        estado,
+        cidade,
+        bairro,
+        rua,
+        numero,
+        complemento,
+        cep,
+      },
+    });
+
+    return res.json(updatedAddress);
+  } catch (error: any) {
+    console.error(error);
+    if (error.code === "P2025") {
+      return res.status(404).json({ error: "Address not found" });
+    }
+    return res.status(500).json({ error: "Error updating address" });
+  }
+};
