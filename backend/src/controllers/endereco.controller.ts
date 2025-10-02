@@ -88,3 +88,21 @@ export const updateAddress = async (req: Request, res: Response) => {
     return res.status(500).json({ error: "Error updating address" });
   }
 };
+
+export const deleteAddress = async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  try {
+    await prisma.endereco.delete({
+      where: { id_endereco: parseInt(id) },
+    });
+
+    return res.json({ message: "Address deleted successfully" });
+  } catch (error: any) {
+    console.error(error);
+    if (error.code === "P2025") {
+      return res.status(404).json({ error: "Address not found" });
+    }
+    return res.status(500).json({ error: "Error deleting address" });
+  }
+};
