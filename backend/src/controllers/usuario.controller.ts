@@ -23,3 +23,15 @@ export const createUser = async (req: Request, res: Response) => {
     return res.status(500).json({ error: "Internal server error" });
   }
 };
+
+export const getUsers = async (req: Request, res: Response) => {
+  try {
+    const users = await prisma.usuario.findMany({
+      orderBy: { id_usuario: "asc" },
+    });
+    return res.json(users);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Error fetching users" });
+  }
+};
