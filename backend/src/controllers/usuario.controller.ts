@@ -79,3 +79,23 @@ export const updateUser = async (req: Request, res: Response) => {
     return res.status(500).json({ error: "Error updating user" });
   }
 };
+
+export const deleteUser = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    await prisma.usuario.delete({
+      where: { id_usuario: Number(id) },
+    });
+
+    return res.json({ message: "User deleted successfully" });
+  } catch (error: any) {
+    console.error(error);
+
+    if (error.code === "P2025") {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    return res.status(500).json({ error: "Error deleting user" });
+  }
+};
